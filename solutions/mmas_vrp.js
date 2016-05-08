@@ -1,8 +1,8 @@
 (function () {
     console.log(' MMAS for VRP is running ... ');
-    var sites, site_1, amounts_1, amounts, output = [];
+    var output = [];
 
-    sites_1 = [[14.5, 13.0],
+    var sites_1 = [[14.5, 13.0],
         [12.8, 8.5],
         [18.4, 3.4],
         [15.4, 16.6],
@@ -23,7 +23,7 @@
         [13.2, 15.1],
         [6.4, 5.6],
         [9.6, 14.8]];
-    amounts_1 = [0,
+    var amounts_1 = [0,
         0.1,
         0.4,
         1.2,
@@ -44,41 +44,42 @@
         1.6,
         1.7,
         1.5];
-    sites = [[18, 54], [22, 60], [58, 69], [71, 71], [83, 46], [91, 38], [24, 42], [18, 40]];
-    amounts = [0, 0.89, 0.14, 0.28, 0.33, 0.21, 0.41, 0.57];
 
-    var vrp_32 = [82, 76, 0,
-        96, 44, 19,
-        50, 5, 21,
-        49, 8, 6,
-        13, 7, 19,
-        29, 89, 7,
-        58, 30, 12,
-        84, 39, 16,
-        14, 24, 6,
-        2, 39, 16,
-        3, 82, 8,
-        5, 10, 14,
-        98, 52, 21,
-        84, 25, 16,
-        61, 59, 3,
-        1, 65, 22,
-        88, 51, 18,
-        91, 2, 19,
-        19, 32, 1,
-        93, 3, 24,
-        50, 93, 8,
-        98, 14, 12,
-        5, 42, 4,
-        42, 9, 8,
-        61, 62, 24,
-        9, 97, 24,
-        80, 55, 2,
-        57, 69, 20,
-        23, 15, 15,
-        20, 70, 2,
-        85, 60, 14,
-        98, 5, 9]
+    // var sites = [[18, 54], [22, 60], [58, 69], [71, 71], [83, 46], [91, 38], [24, 42], [18, 40]];
+    // var amounts = [0, 0.89, 0.14, 0.28, 0.33, 0.21, 0.41, 0.57];
+
+    var vrp_32 = [82, 76,
+        96, 44,
+        50, 5,
+        49, 8,
+        13, 7,
+        29, 89,
+        58, 30,
+        84, 39,
+        14, 24,
+        2, 39,
+        3, 82,
+        5, 10,
+        98, 52,
+        84, 25,
+        61, 59,
+        1, 65,
+        88, 51,
+        91, 2,
+        19, 32,
+        93, 3,
+        50, 93,
+        98, 14,
+        5, 42,
+        42, 9,
+        61, 62,
+        9, 97,
+        80, 55,
+        57, 69,
+        23, 15,
+        20, 70,
+        85, 60,
+        98, 5];
     var vrp_32_amount = [
         0,
         19,
@@ -111,7 +112,7 @@
         15,
         2,
         14,
-        9]
+        9];
     function mmas_vrp(sites, amounts) {
         /** 定义：
          *  变量与函数
@@ -127,6 +128,7 @@
             p, path_lengthes = [];
 
         N = SITES.length;
+        M = N;
         // 计算两点间距离
         function tp_dist(x, y) {
             return Math.sqrt(Math.pow((SITES[x][0] - SITES[y][0]), 2) +
@@ -135,10 +137,7 @@
         // 计算一条路径的长度
         function rout_dist(rout) {
             var len = rout.length;
-            if (len < 2) {
-                return;
-            }
-            else {
+            if (len >= 2) {
                 var pathLength = 0;
                 for (var i = 0; i < len - 1; i++) {
                     pathLength += D[rout[i]][rout[i + 1]];
@@ -243,10 +242,10 @@
          *  算法执行
          */
         // 距离矩阵，信息素矩阵初始化
-        for (var i = 0; i < N; i++) {
+        for (i = 0; i < N; i++) {
             D[i] = [];
             TAU[i] = [];
-            for (var j = 0; j < N; j++) {
+            for (j = 0; j < N; j++) {
                 D[i][j] = tp_dist(i, j);
                 TAU[i][j] = MAX;
             }
@@ -263,7 +262,7 @@
         for (var t = 0; t < T; t++) {
             //console.log('第 ' + t + ' 次循环： ');
             // 随机选择起点 
-            for (var i = 0; i < M; i++) {
+            for (i = 0; i < M; i++) {
                 move_to(i, Math.round(Math.random() * (N - 2)) + 1);
             }
             // 构建禁忌表矩阵
@@ -329,12 +328,12 @@
             //console.log('l_len: ' + l_len);
             // console.log('l_rout: ' + l_rout);
             // 更新全局最短路径
-            if (l_len < g_len || g_len == undefined) {
+            if ( g_len == undefined || l_len < g_len ) {
                 g_len = l_len;
                 g_rout = l_rout;
             }
             // 更新信息素        
-            for (var i = 0; i < N; i++) {
+            for (i = 0; i < N; i++) {
                 for (var j = 0; j < N; j++) {
                     new_tau = TAU[i][j] * RHO;
                     // 信息素强度应大于MIN
@@ -369,7 +368,7 @@
     }
 
     for (var i = 0; i < 1; i++) {
-        output[i] = mmas_vrp(vrp_32,vrp_32_amount);
+        output[i] = mmas_vrp(sites_1, amounts_1);
     }
 
     (function output_info(o) {
@@ -383,7 +382,7 @@
         min = (function (a) {
             var min;
             for (var i = 0; i < a.length; i++) {
-                if (min > a[i] || min == undefined) {
+                if (min == undefined || min > a[i]) {
                     min = a[i];
                 }
             }
@@ -392,7 +391,7 @@
             }
             return min;
         })(pathes);
-        console.log('运行次数：' + o.length + ' ，结果如下：')
+        console.log('运行次数：' + o.length + ' ，结果如下：');
         console.log('平均值: ' + sum / o.length);
         console.log('最小值: ' + min);
         console.log('移动顺序: ' + o[pathes.indexOf(min)].routine);
