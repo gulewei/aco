@@ -143,7 +143,7 @@ function antcycle_system () {
 	rho = 0.7;
 	Q = 1;
 	//城市初始化
-	prob_path = "E:/Users/Desktop/aco/problems/tsp225.csv";
+	prob_path = "E:/Users/Desktop/Huan/aco/problems/eil51.csv";
 	cities = readIntoArray(prob_path);
 	N = cities.length;
 	//蚁群初始化
@@ -170,7 +170,7 @@ function antcycle_system () {
 	var min, pathLength, nextStop;
 	//每次循环
 	for (var z = 0; z < T; z++) {
-		console.log("第" + z + "次循环: ");
+		//console.log("第" + z + "次循环: ");
 		for (j = 0; j < N - 1; j++) {
 			//每只蚂蚁	
 			for (k = 0; k < M; k++) {

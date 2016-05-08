@@ -245,7 +245,7 @@
     // 执行次数
     console.log("mmas for tsp is running ... ");
     var output = [];
-    for (var i = 0; i < 1; i++) {
+    for (var i = 0; i < 10; i++) {
         console.time("time");
         output[i] = mmas_tsp(sites);
         console.timeEnd("time");

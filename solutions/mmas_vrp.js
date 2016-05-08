@@ -113,12 +113,13 @@
         2,
         14,
         9];
+        
     function mmas_vrp(sites, amounts) {
         /** 定义：
          *  变量与函数
          */
-        var M = 20, N, T = 300, SITES = sites,
-            ALPHA = 1, BETA = 5, RHO = 0.75,
+        var M, N, T = 400, SITES = sites,
+            ALPHA = 1, BETA = 8, RHO = 0.75,
             MAX = 10, MIN = 0.01, Q = 100,
             D = [], TAU = [], AMOUNTS = amounts,
             tabus = [], allowed = [], giveup = [],
@@ -367,7 +368,7 @@
         };
     }
 
-    for (var i = 0; i < 1; i++) {
+    for (var i = 0; i < 10; i++) {
         output[i] = mmas_vrp(sites_1, amounts_1);
     }
 
