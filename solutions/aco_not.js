@@ -761,38 +761,3 @@
         //mm_ant_system(prob);
     }
 })();
-
-// (function () {
-//     //console.log(" test is running ... ")
-//     var output = [];
-//     function test() {
-//         var a = [0, 2, 3, 0, 0, 0, 0, 5];
-//         var r = Math.random() * a.reduce(function (a, b) { return a + b });
-//         function chose(ran, arr) {
-//             // arr.sort(function (a, b) { return b - a; });
-//             // console.log("arr sorted: " + arr);
-//             var n_arr = [], index;
-//             for (var i = 0; i < arr.length; i++) {
-//                 n_arr.push(arr[i]);
-//                 for (var j = i - 1; j >= 0; j--) {
-//                     n_arr[n_arr.length - 1] += arr[j];
-//                 }
-//             }
-//             //console.log("n_arr: " + n_arr);
-//             for (index = 0; index < n_arr.length; index++) {
-//                 if (ran < n_arr[index]) {
-//                     return index;
-//                 }
-//                 //console.log("i : " + i);
-//             }
-//         }
-//         // console.log("r: " + r);
-//         // console.log("chose: " + chose(r, a));
-//         return [r, chose(r, a)];
-//     }
-//     for (var i = 0; i < 10; i++) {
-//         output.push(test());
-//     }
-
-//     //console.log(output);
-// })();

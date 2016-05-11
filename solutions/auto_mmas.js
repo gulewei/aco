@@ -19,8 +19,8 @@
          *  变量与函数
          */
         var M, N, T = 300, SITES = sites, RHO = 1,
-            ALPHA = 1, BETA = 9, RHO_MIN = 0.1,
-            MAX = 10, MIN = 0.01, Q = 100,
+            ALPHA = 1, BETA = 7, RHO_MIN = 0.5,
+            MAX = 10, MIN = 2, Q = 10,
             D = [], TAU = [],
             tabus = [], allowed = [], site = [],
             best_ant, l_len = [], l_rout = [], g_len = [], g_rout = [],
@@ -157,8 +157,8 @@
                     //console.log('n: ' + n);
                     // 概率区间列表
                     p = (function (ant_k) {
-                        var p = [0];
-                        for (var j = 1; j < N; j++) {
+                        var p = [];
+                        for (var j = 0; j < N; j++) {
                             if (allowed[ant_k][j]) {
                                 p[j] = pk(site[ant_k], j);
                             }
@@ -205,7 +205,7 @@
                 g_len[t] = g_len[t - 1];
                 g_rout[t] = g_rout[t - 1];
             }
-            
+
             (function () {
                 var N = 10;
                 if (RHO > RHO_MIN && t > N && g_len[t] >= g_len[t - N]) {
@@ -216,28 +216,27 @@
                     else {
                         RHO = RHO_MIN;
                     }
-                    // 信息素衰减        
-                    for (var i = 0; i < N; i++) {
-                        for (var j = 0; j < N; j++) {
-                            new_tau = TAU[i][j] * RHO;
-                            // 信息素强度应大于MIN
-                            if (new_tau < MIN) {
-                                TAU[i][j] = MIN;
-                            }
-                            else {
-                                TAU[i][j] = new_tau;
-                            }
-                        }
-                    }
                 }
             })();
-
+            // 信息素衰减        
+            for (var i = 0; i < N; i++) {
+                for (var j = 0; j < N; j++) {
+                    new_tau = TAU[i][j] * RHO;
+                    // 信息素强度应大于MIN
+                    if (new_tau < MIN) {
+                        TAU[i][j] = MIN;
+                    }
+                    else {
+                        TAU[i][j] = new_tau;
+                    }
+                }
+            }
             // 计算信息素增量
             delta_tau = Q / l_len[t];
             // 最优解路径上信息素增加
-            (function (){
+            (function () {
                 var r = l_rout[t], a, b;
-                for (var i = 0; i <r.length - 2; i++) {
+                for (var i = 0; i < r.length - 2; i++) {
                     a = r[i];
                     b = r[i + 1];
                     new_tau = TAU[a][b] + delta_tau;
@@ -248,23 +247,24 @@
                 }
                 else {
                     TAU[a][b] = new_tau;
-                    TAU[b][a] = new_tau;                    
+                    TAU[b][a] = new_tau;
                 }
             })();
             // 重置禁忌表矩阵，allowed矩阵
             ants_redefine();
         }
         // console.timeEnd('time');
+        //console.log("g_len: " + g_len);
         // 返回结果
         return {
-            path: g_len[T-1],
-            routine: g_rout[T-1]
+            path: g_len[T - 1],
+            routine: g_rout[T - 1]
         };
     }
     // 执行次数
     console.log("mmas for tsp is running ... ");
     var output = [];
-    for (var i = 0; i < 1; i++) {
+    for (var i = 0; i < 10; i++) {
         console.time("time");
         output[i] = mmas_tsp(sites);
         console.timeEnd("time");

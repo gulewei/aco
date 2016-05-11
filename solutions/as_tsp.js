@@ -143,7 +143,7 @@ function antcycle_system () {
 	rho = 0.7;
 	Q = 1;
 	//城市初始化
-	prob_path = "E:/Users/Desktop/Huan/aco/problems/eil51.csv";
+	prob_path = "E:/Users/Desktop/Huan/aco/problems/30cities.csv";
 	cities = readIntoArray(prob_path);
 	N = cities.length;
 	//蚁群初始化
