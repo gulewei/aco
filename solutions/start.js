@@ -23,8 +23,8 @@
      *  算法程序：
      *  定义 MMAS 算法程序，在算法调用中执行
      */
-    var solution = "mmas_tsp.js";
-    var aco = require("E:/Users/Desktop/Huan/aco/solutions/" + solution);
+
+    const aco = require("./as.js");
 
     /**
      *  算法调用：
@@ -38,16 +38,15 @@
      *       loop: 循环次数
      *       }
      */
-    var T = 1;      // 参数 T，用于修改算法执行次数  
-    var args = {    // 参数args，用于修改一系列算法参数
+
+    var args = {
         alpha: 1,
         beta: 9,
         rho: 0.7,
-        max: 10,
-        min: 0.01,
         loop: 300
     };
-
+    var T = 1;
+    
     /**
      * 执行
      */

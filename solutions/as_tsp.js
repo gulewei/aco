@@ -1,218 +1,227 @@
-function antcycle_system () {
-	/*  PARAMETERS & FUNCTIONS  */
-	var N, Q, M, T, D, TAU, alpha, beta, rho, init_tau,
-		cites, ants, i, j, k, MINPATH, prob_path, best_path;
+function as_tsp(sites, args) {
+    /** 定义：
+     *  变量与函数
+     */
+    var M, N, T = args.loop, SITES = sites,
+        ALPHA = args.alpha, BETA = args.beta, RHO = args.rho,
+        Q = 100, init_tau = 10,
+        D = [], TAU = [],
+        tabus = [], allowed = [], site = [],
+        best_ant, l_len, l_rout = [], g_len, g_rout = [],
+        p, path_lengthes = [];
 
-	function readIntoArray(path) {
-		var rf=require("fs");  
-		var data=rf.readFileSync(path,"utf-8");  
-		data = data.split("\r\n");
-		for (var i = 0; i < data.length; i++) {
-			data[i] = data[i].split(",");
-			for (var j = 0; j < data[i].length; j++) {
-				data[i][j] = parseFloat(data[i][j]);
-			}
-		}  
-		return data;
-	}
+    N = SITES.length;
+    M = N;
+    // 计算两点间距离
+    function tp_dist(x, y) {
+        return Math.sqrt(Math.pow((SITES[x][0] - SITES[y][0]), 2) +
+            Math.pow((SITES[x][1] - SITES[y][1]), 2));
+    }
+    // 计算一条路径的长度
+    function rout_dist(rout) {
+        var len = rout.length;
+        if (len < 2) {
+            return;
+        }
+        else {
+            var pathLength = 0;
+            for (var i = 0; i < len - 1; i++) {
+                pathLength += D[rout[i]][rout[i + 1]];
+            }
+            return pathLength;
+        }
+    }
+    // 计算边（i，j）的eta值
+    function eta(i, j) {
+        var x = 1 / D[i][j];
+        if (isNaN(x)) {
+            throw new Error('eta is not a number');
+        }
+        return x;
+    }
+    // 转移概率（分子部分）
+    function pk(i, j) {
+        var x;
+        if (i == j) {
+            return 0;
+        }
+        else {
+            x = Math.pow(TAU[i][j], ALPHA) * Math.pow(eta(i, j), BETA);
+            if (isNaN(x)) {
+                throw new Error('pk is not a number');
+            }
+            return x;
+        }
+    }
+    // 数组求和
+    function sum(a) {
+        var sum = 0;
+        for (var i = 0; i < a.length; i++) {
+            sum += a[i];
+        }
+        return sum;
+    }
+    // 生成一个随机数，返回其在一组区间中的位置（选择下一站点）
+    function chose(p) {
+        var r = Math.random(), z = 0;
+        for (var i = 0; i < p.length; i++) {
+            z += p[i];
+            if (r < z) {
+                return i;
+            }
+        }
+    }
+    // 返回数组中最小值的索引
+    function select_min(a) {
+        var min = a[0], index = 0;
+        for (var i = 1; i < a.length; i++) {
+            if (min > a[i]) {
+                min = a[i];
+                index = i;
+            }
+        }
+        return index;
+    }
+    // 移动蚂蚁k到站点j
+    function move_to(ant_k, site_j) {
+        site[ant_k] = site_j;
+        tabus[ant_k].push(site_j);
+        allowed[ant_k][site_j] = false;
+    }
+    // capacity, travel, giveup, allowed, tabus, site
+    function ants_redefine() {
+        for (i = 0; i < M; i++) {
+            tabus[i] = [];
+            allowed[i] = [];
+            site[i] = 0;
+            for (j = 0; j < N; j++) {
+                allowed[i][j] = true;
+            }
+        }
+        // console.log('tabus: ' + tabus);
+        // console.log('allowed: ' + allowed);
+        // console.log('capacity: ' + capacity);
+        // console.log('travel: ' + travel);
+        // console.log('giveup: ' + giveup);
+        // console.log('site: ' + site);           
+    }
 
-	function Ant() {
-		var site, tabu;
-		this.site = site;
-		this.tabu = tabu;
-		this.move = function (site) {
-			this.site = site;
-			this.tabu.push(site);
-		}
-		this.born = function () {
-			this.tabu = [];
-			this.move(Math.round(Math.random() * (N - 1)));
-		}
-		this.delTau = function () {
-			return Q / dist(this.tabu);
-		}
-		this.walked = function (start, stop) {
-			if (Math.abs(this.tabu.indexOf(start) - this.tabu.indexOf(stop)) == 1) {
-				return 1;
-			}
-			else {
-				return 0;
-			}
-		}
-		this.born();
-	}
+    /** 开始：
+     *  算法执行
+     */
+    // 距离矩阵，信息素矩阵初始化
+    for (var i = 0; i < N; i++) {
+        D[i] = [];
+        TAU[i] = [];
+        for (var j = 0; j < N; j++) {
+            D[i][j] = tp_dist(i, j);
+            TAU[i][j] = init_tau;
+        }
+    }
+    // console.log("tau: " + TAU);
+    // console.log("D: " +D);
+    // 初始化禁忌表矩阵等相关数据
+    ants_redefine();
+    // console.time('time');
+    // 主循环
+    var p_sum = 0, next_site, n,
+        delta_tau = 0, new_tau = 0;
 
-	//计算两点间距离
-	function tpDist(x, y) {
-		//x, y为城市的序号
-		return Math.sqrt(Math.pow((cities[x][0] - cities[y][0]), 2) +
-			Math.pow((cities[x][1] - cities[y][1]), 2));
-	}
+    for (var t = 0; t < T; t++) {
+        //console.log('第 ' + t + ' 次循环： ');
+        // 随机选择起点 
+        for (var i = 0; i < M; i++) {
+            move_to(i, Math.round(Math.random() * (N - 1)));
+        }
+        // 构建禁忌表矩阵
+        //console.time('tabus');
+        for (var ant_k = 0; ant_k < M; ant_k++) {
+            n = 1;
+            while (n < N) {
+                //console.log('n: ' + n);
+                // 概率区间列表
+                p = (function (ant_k) {
+                    var p = [];
+                    for (var j = 0; j < N; j++) {
+                        if (allowed[ant_k][j]) {
+                            p[j] = pk(site[ant_k], j);
+                        }
+                        else {
+                            p[j] = 0;
+                        }
+                    }
+                    if (sum(p) == 0) {
+                        throw new Error('p is zero list');
+                    }
+                    else if (isNaN(sum(p))) {
+                        throw new Error('sum p is not a number');
+                    }
+                    return p;
+                })(ant_k);
+                p_sum = sum(p);
+                //console.log(' p_sum: ' + p_sum)
+                for (var i = 0; i < p.length; i++) {
+                    p[i] /= p_sum;
+                }
+                // 随机选择区间
+                next_site = chose(p);
+                //console.log(' after sum: ' + p);
+                move_to(ant_k, next_site);
+                // 循环
+                n += 1;
+            }
+        }
+        //console.log('n: ' + n);
+        //console.timeEnd('tabus');
+        // (function tabus_info() {
+        //     for (var i = 0; i < M; i++) {
+        //         console.log('[' + tabus[i] + ']');
+        //     }
+        // })();
+        // 计算循环最短路径
+        for (ant_k = 0; ant_k < M; ant_k++) {
+            path_lengthes[ant_k] = rout_dist(tabus[ant_k]);
+        }
+        best_ant = select_min(path_lengthes);
+        l_len = path_lengthes[best_ant];
+        l_rout = tabus[best_ant];
+        //console.log('l_len: ' + l_len);
+        // console.log('l_rout: ' + l_rout);
+        // 更新全局最短路径
+        if (l_len < g_len || g_len == undefined) {
+            g_len = l_len;
+            g_rout = l_rout;
+        }
+        // 更新信息素      
+        (function () {
+            var list_delta_tau = [], i, j, k, delta_tau, new_tau;
+            for (i = 0; i < M; i++) {
+                list_delta_tau[i] = Q / path_lengthes[i];
+            }
+            delta_tau = 0;
+            for (i = 0; i < N; i++) {
+                for (j = 0; j < N; j++) {
+                    for (k = 0; k < M; k++) {
+                        if (Math.abs(tabus[k][i] - tabus[k][j]) == 1) {
+                            delta_tau += list_delta_tau[k]
+                        }
+                    }
+                    new_tau = RHO * TAU[i][j] + delta_tau;
+                    TAU[i][j] = new_tau;
+                }
+            }
+            
+        })();
 
-	//计算路径长度
-	function dist(a) {
-		var len = a.length;
-		if (len < 2) {
-			return;
-		}
-		else {
-			var pathLength = 0;
-			for (var i = 0; i < len - 1; i++) {
-				pathLength += tpDist(a[i], a[i + 1]);
-			}
-			return pathLength;
-		}
-	}
-
-	//ETA计算
-	function eta(start, stop) {
-		return 1 / D[start][stop];
-	}
-
-	// 转移概率（分子部分）
-	function pk(start, stop) {
-		if (start == stop) {
-			return 0;
-		}
-		else {
-			return Math.pow(TAU[start][stop], alpha) *
-				Math.pow(eta(start, stop), beta);
-		}
-	}
-
-	// 选择城市
-	function pick(start, ant_k) {
-		var p = [], pk_list = [], pk_sum = 0;
-		for (var i = 0; i < N; i++) {
-			if (ants[ant_k].tabu.indexOf(i) < 0) {
-				pk_list.push(pk(start, i));
-			}
-			else {
-				pk_list.push(0);
-			}
-			pk_sum += pk_list[pk_list.length - 1];
-		}
-		for (i = 0; i < N; i++) {
-			p.push(pk_list[i] / pk_sum);
-		}
-		return chose(p);
-
-		function chose(a) {
-			//返回一个数组中最大元素的序号
-			var max = 0;
-			for (var i = 0; i < a.length; i++) {
-				if (max < a[i] || max == 0) {
-					max = a[i];
-				}
-			}
-			return a.indexOf(max);
-		}
-	}
-
-	// 更新一条边的信息素轨迹
-	function edgeUpdate(start, stop) {
-		var del_tau = 0, new_tou;
-		for (var i = 0; i < M; i++) {
-			if (ants[i].walked(start, stop)) {
-				del_tau += ants[i].delTau();
-			}
-		}
-		new_tou = rho * TAU[start][stop] + del_tau;
-		TAU[start][stop] = new_tou;
-	}
-	
-	function getMinIndex(a) {
-		var min = a[0], index = 0;
-		for (var i = 1; i < a.length; i++) {
-			if (min > a[i]) {
-				min = a[i];
-				index = i;
-			}
-		}
-		return index;
-	}
-
-	/*  SET UP  */
-	//初始最短路劲设为 -1
-	MINPATH = -1;
-	//循环次数
-	T = 300;
-	//算法参数
-	alpha = 1;
-	beta = 5;
-	rho = 0.7;
-	Q = 1;
-	//城市初始化
-	prob_path = "E:/Users/Desktop/Huan/aco/problems/30cities.csv";
-	cities = readIntoArray(prob_path);
-	N = cities.length;
-	//蚁群初始化
-	M = N;
-	ants = [];
-	for (i = 0; i < M; i++) {
-		ants.push(new Ant());
-	}
-	//矩阵D，储存每条边的长度
-	//矩阵TAU, 储存每条边的信息素强度
-	D = [];
-	TAU = [];
-	init_tau = 10;
-	for (i = 0; i < N; i++) {
-		D.push([]);
-		TAU.push([]);
-		for (j = 0; j < N; j++) {
-			D[i].push(tpDist(i, j));
-			TAU[i].push(init_tau);
-		}
-	}
-	console.time("time");
-	/*  MAIN  */
-	var min, pathLength, nextStop;
-	//每次循环
-	for (var z = 0; z < T; z++) {
-		//console.log("第" + z + "次循环: ");
-		for (j = 0; j < N - 1; j++) {
-			//每只蚂蚁	
-			for (k = 0; k < M; k++) {
-				//选择下一个城市
-				nextStop = pick(ants[k].site, k);
-				//选择城市，更新位置,禁忌表
-				ants[k].move(nextStop);
-			}
-		}
-		//找出最短路径
-		pathLength = [];
-		for (j = 0; j < M; j++) {
-			pathLength.push(dist(ants[j].tabu));
-			//console.log(ants[j].tabu);
-		}
-		min = pathLength[getMinIndex(pathLength)];
-		best_path = ants[getMinIndex(pathLength)].tabu;
-		//console.log("当前最短路径: " + best_path);
-		//更新最短路径
-		if (min < MINPATH || MINPATH < 0) {
-			MINPATH = min;
-			best_path = ants[getMinIndex(pathLength)].tabu;
-		}
-		//console.log("当前最短路径: " + best_path);
-		//console.log("当前距离： " + MINPATH);
-		//更新新信息素
-		for (j = 0; j < N; j++) {	
-			for (k = 0; k < N; k++) {
-				edgeUpdate(j, k);
-			}		
-		}
-		//清空禁忌表
-		for (j = 0; j < M; j++) {
-			ants[j].born();
-		}
-	}
-	//输出结果
-	console.log(best_path);
-	console.log(MINPATH);
-	console.timeEnd("time");
-}
-
-console.log(" antcycle_system is running ... ");
-antcycle_system();
-
+        // 重置禁忌表矩阵，allowed矩阵
+        ants_redefine();
+    }
+    // console.timeEnd('time');
+    // 返回结果
+    return {
+        path: g_len,
+        routine: g_rout
+    };
+};
+exports.name = "as_tsp";
+exports.run = as_tsp;

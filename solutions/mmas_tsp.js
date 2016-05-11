@@ -4,7 +4,7 @@ function mmas_tsp(sites, args) {
      */
     var M, N, T = args.loop, SITES = sites,
         ALPHA = args.alpha, BETA = args.beta, RHO = args.rho,
-        MAX = args.max, MIN = args.min, Q = 100,
+        MAX = 10, MIN = 0.1, Q = 100,
         D = [], TAU = [],
         tabus = [], allowed = [], site = [],
         best_ant, l_len, l_rout = [], g_len, g_rout = [],
