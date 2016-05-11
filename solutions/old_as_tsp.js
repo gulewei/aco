@@ -1,20 +1,7 @@
-function antcycle_system () {
+function antcycle_system (sites, args) {
 	/*  PARAMETERS & FUNCTIONS  */
 	var N, Q, M, T, D, TAU, alpha, beta, rho, init_tau,
 		cites, ants, i, j, k, MINPATH, prob_path, best_path;
-
-	function readIntoArray(path) {
-		var rf=require("fs");  
-		var data=rf.readFileSync(path,"utf-8");  
-		data = data.split("\r\n");
-		for (var i = 0; i < data.length; i++) {
-			data[i] = data[i].split(",");
-			for (var j = 0; j < data[i].length; j++) {
-				data[i][j] = parseFloat(data[i][j]);
-			}
-		}  
-		return data;
-	}
 
 	function Ant() {
 		var site, tabu;
@@ -136,15 +123,14 @@ function antcycle_system () {
 	//初始最短路劲设为 -1
 	MINPATH = -1;
 	//循环次数
-	T = 300;
+	T = args.loop;
 	//算法参数
-	alpha = 1;
-	beta = 5;
-	rho = 0.7;
+	alpha = args.alpha;
+	beta = args.beta;
+	rho = args.rho;
 	Q = 1;
 	//城市初始化
-	prob_path = "E:/Users/Desktop/Huan/aco/problems/30cities.csv";
-	cities = readIntoArray(prob_path);
+	cities = sites;
 	N = cities.length;
 	//蚁群初始化
 	M = N;
@@ -165,7 +151,6 @@ function antcycle_system () {
 			TAU[i].push(init_tau);
 		}
 	}
-	console.time("time");
 	/*  MAIN  */
 	var min, pathLength, nextStop;
 	//每次循环
@@ -208,11 +193,11 @@ function antcycle_system () {
 		}
 	}
 	//输出结果
-	console.log(best_path);
-	console.log(MINPATH);
-	console.timeEnd("time");
+	return {
+		path: MINPATH,
+		routine: best_path
+	};
 }
 
-console.log(" antcycle_system is running ... ");
-antcycle_system();
-
+exports.name = "as (old version) for tsp";
+exports.run = antcycle_system;
