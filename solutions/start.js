@@ -4,7 +4,7 @@
      *  参数 problem:  problems中文件名， 
      *  如：var problem = "20cities.csv"
      */
-    var problem = "30cities.csv";
+    var problem = "eil51.csv";
     var sites = (function (path) {
         var rf = require("fs");
         var root = "E:/Users/Desktop/Huan/aco/problems/";
@@ -24,7 +24,8 @@
      *  定义 MMAS 算法程序，在算法调用中执行
      */
 
-    const aco = require("./as.js");
+    const aco = require("./mmas_tsp.js");
+    var T = 1;
 
     /**
      *  算法调用：
@@ -45,17 +46,16 @@
         rho: 0.7,
         loop: 300
     };
-    var T = 1;
-    
+
     /**
      * 执行
      */
-    console.log("%s for tsp is running ... ", aco.name);
+    console.log("> %s 正在运行 ... ", aco.name);
     var output = [];
     for (var i = 0; i < T; i++) {
-        console.time("循环" + (i + 1) + "，耗时：");
+        console.time("> 算法运行第" + (i + 1) + "次，耗时");
         output[i] = aco.run(sites, args);
-        console.timeEnd("循环" + (i + 1) + "，耗时：");
+        console.timeEnd("> 算法运行第" + (i + 1) + "次，耗时");
     }
 
     /**
@@ -85,6 +85,10 @@
         console.log('运行次数：' + o.length + ' ，结果如下：')
         console.log('平均值: ' + sum / o.length);
         console.log('最小值: ' + min);
+        // var f = o[pathes.indexOf(min)].routine;
+        // for (var i = 0; i < f.length; i++) {
+        //     console.log(i + 1 + ": " + f[i]);
+        // }
         console.log('移动顺序: ' + o[pathes.indexOf(min)].routine);
     })(output);
 })();
