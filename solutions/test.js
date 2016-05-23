@@ -1,6 +1,4 @@
-var tau = {
-    search: ["search ant 1", "search ant 2"],
-    detection: ["detection ant 1", "detection ant 2"]
-}
-var catagray = "search";
-console.log("search: " + tau[catagray]);
+var rf = require("fs");
+
+var p = rf.readFileSync("./problems/eil51.csv", "utf-8");
+console.log(p);

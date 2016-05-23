@@ -130,7 +130,7 @@ function paspas_tsp(sites, args) {
     for (var t = 0; t < T; t++) {
         //console.log('第 ' + t + ' 次循环： ');
         // 随机选择起点 
-        for (var i = 0; i < M; i++) {
+        for (i = 0; i < M; i++) {
             move_to(i, Math.round(Math.random() * (N - 1)));
         }
         // 构建禁忌表矩阵
@@ -150,7 +150,7 @@ function paspas_tsp(sites, args) {
                             p[j] = 0;
                         }
                     }
-                    if (sum(p) == 0) {
+                    if (sum(p) === 0) {
                         throw new Error('p is zero list');
                     }
                     else if (isNaN(sum(p))) {
@@ -160,7 +160,7 @@ function paspas_tsp(sites, args) {
                 })(ant_k);
                 p_sum = sum(p);
                 //console.log(' p_sum: ' + p_sum)
-                for (var i = 0; i < p.length; i++) {
+                for (i = 0; i < p.length; i++) {
                     p[i] /= p_sum;
                 }
                 // 随机选择区间
@@ -188,12 +188,12 @@ function paspas_tsp(sites, args) {
         //console.log('lengthLocal: ' + lengthLocal);
         // console.log('routineLocal: ' + routineLocal);
         // 更新全局最短路径
-        if (lengthLocal < lengthGloble || lengthGloble == undefined) {
+        if (lengthLocal < lengthGloble || lengthGloble === undefined) {
             lengthGloble = lengthLocal;
             routineGloble = routineLocal;
         }
         // 更新信息素        
-        for (var i = 0; i < N; i++) {
+        for ( i = 0; i < N; i++) {
             for (var j = 0; j < N; j++) {
                 new_tau = tau[i][j] * RHO;
                 // 信息素强度应大于MIN
@@ -225,6 +225,6 @@ function paspas_tsp(sites, args) {
         path: lengthGloble,
         routine: routineGloble
     };
-};
+}
 exports.run = paspas_tsp;
 exports.name = "paspas_tsp";

@@ -6,7 +6,7 @@
 			"type": "node",
 			"request": "launch",
 			"program": "${workspaceRoot}/solutions/start.js",
-			//"program": "${workspaceRoot}/solutions/server.js",
+			//"program": "${workspaceRoot}/solutions/test.js",
 			"stopOnEntry": false,
 			"args": [],
 			"cwd": "${workspaceRoot}",

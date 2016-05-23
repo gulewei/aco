@@ -7,7 +7,7 @@
     var problem = "eil51.csv";
     var sites = (function (path) {
         var rf = require("fs");
-        var root = "E:/Users/Desktop/Huan/aco/problems/";
+        var root = "./problems/";
         var data = rf.readFileSync(root + path, "utf-8");
         data = data.split("\r\n");
         for (var i = 0; i < data.length; i++) {
@@ -24,7 +24,7 @@
      *  定义 MMAS 算法程序，在算法调用中执行
      */
 
-    const aco = require("./mmas_tsp.js");
+    var aco = require("./mmas_tsp.js");
     var T = 1;
 
     /**
@@ -73,16 +73,16 @@
         min = (function (a) {
             var min;
             for (var i = 0; i < a.length; i++) {
-                if (min > a[i] || min == undefined) {
+                if (min > a[i] || min === undefined) {
                     min = a[i];
                 }
             }
-            if (min == undefined) {
+            if (min === undefined) {
                 throw new Error('undefined min');
             }
             return min;
         })(pathes);
-        console.log('运行次数：' + o.length + ' ，结果如下：')
+        console.log('运行次数：' + o.length + ' ，结果如下：');
         console.log('平均值: ' + sum / o.length);
         console.log('最小值: ' + min);
         // var f = o[pathes.indexOf(min)].routine;
