@@ -2,13 +2,13 @@
  * Tau
  */
 class Tau {
-    private _tau: number[][];
-    private tauInit: number;
-    private max: number;
-    private min: number;
-    private N: number;
-    private rho: number;
-    private q: number;
+    public _tau: number[][];
+    public tauInit: number;
+    public max: number;
+    public min: number;
+    public N: number;
+    public rho: number;
+    public q: number;
 
     constructor(sitesNum: number, a: number, b: number, rho: number, q: number) {
         this.N = sitesNum;
@@ -58,4 +58,28 @@ class Tau {
         }
     }
 }
+/**
+ * SearchTau
+ */
+class SearchTau extends Tau {
+    update(routs: number[][], delts: number[]) {
+        var rout: number[] = routs[0];
+        var delta: number = delts[0];
+        var deltaTau: number = this.q / delta;
+        var newTau: number;
+        for (var i = 0; i < rout.length; i++) {
+            newTau = this._tau[rout[i]][rout[i + 1]] * this.rho - deltaTau;
+            if (newTau > this.max) {
+                this._tau[rout[i]][rout[i+1]] = this.max;
+            }
+            else if (newTau < this.min) {
+                this._tau[rout[i]][rout[i+1]] = this.max;
+            }
+            else {
+                this._tau[rout[i]][rout[i+1]] = newTau;
+            }
+        }
+    }
+}
 export {Tau};
+export {SearchTau};

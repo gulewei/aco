@@ -1,8 +1,12 @@
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 /**
  * Tau
  */
 var Tau = (function () {
-    "use strict";
     function Tau(sitesNum, a, b, rho, q) {
         this.N = sitesNum;
         this.max = a;
@@ -57,4 +61,32 @@ var Tau = (function () {
     return Tau;
 }());
 exports.Tau = Tau;
-
+/**
+ * SearchTau
+ */
+var SearchTau = (function (_super) {
+    __extends(SearchTau, _super);
+    function SearchTau() {
+        _super.apply(this, arguments);
+    }
+    SearchTau.prototype.update = function (routs, delts) {
+        var rout = routs[0];
+        var delta = delts[0];
+        var deltaTau = this.q / delta;
+        var newTau;
+        for (var i = 0; i < rout.length; i++) {
+            newTau = this._tau[rout[i]][rout[i + 1]] * this.rho - deltaTau;
+            if (newTau > this.max) {
+                this._tau[rout[i]][rout[i + 1]] = this.max;
+            }
+            else if (newTau < this.min) {
+                this._tau[rout[i]][rout[i + 1]] = this.max;
+            }
+            else {
+                this._tau[rout[i]][rout[i + 1]] = newTau;
+            }
+        }
+    };
+    return SearchTau;
+}(Tau));
+exports.SearchTau = SearchTau;

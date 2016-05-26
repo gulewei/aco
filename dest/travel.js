@@ -14,16 +14,6 @@ var Travel = (function () {
             this.all[i] = i;
         }
     }
-    Travel.prototype.selectMin = function (a) {
-        var min = a[0], index = 0;
-        for (var i = 1; i < a.length; i++) {
-            if (min > a[i]) {
-                min = a[i];
-                index = i;
-            }
-        }
-        return index;
-    };
     Travel.prototype.pk = function (i, j) {
         if (i == j) {
             return 0;
