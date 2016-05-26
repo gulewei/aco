@@ -14,8 +14,7 @@ function paspas_tsp(sites, args) {
     M = N;
     // 计算两点间距离
     function tp_dist(x, y) {
-        return Math.sqrt(Math.pow((SITES[x][0] - SITES[y][0]), 2) +
-            Math.pow((SITES[x][1] - SITES[y][1]), 2));
+        return Math.sqrt(Math.pow((SITES[x][0] - SITES[y][0]), 2) + Math.pow((SITES[x][1] - SITES[y][1]), 2));
     }
     // 计算一条路径的长度
     function rout_dist(rout) {
@@ -193,7 +192,7 @@ function paspas_tsp(sites, args) {
             routineGloble = routineLocal;
         }
         // 更新信息素        
-        for ( i = 0; i < N; i++) {
+        for (i = 0; i < N; i++) {
             for (var j = 0; j < N; j++) {
                 new_tau = tau[i][j] * RHO;
                 // 信息素强度应大于MIN

@@ -113,7 +113,7 @@
         2,
         14,
         9];
-        
+
     function mmas_vrp(sites, amounts) {
         /** 定义：
          *  变量与函数
@@ -132,8 +132,7 @@
         M = N;
         // 计算两点间距离
         function tp_dist(x, y) {
-            return Math.sqrt(Math.pow((SITES[x][0] - SITES[y][0]), 2) +
-                Math.pow((SITES[x][1] - SITES[y][1]), 2));
+            return Math.sqrt(Math.pow((SITES[x][0] - SITES[y][0]), 2) + Math.pow((SITES[x][1] - SITES[y][1]), 2));
         }
         // 计算一条路径的长度
         function rout_dist(rout) {
@@ -243,10 +242,10 @@
          *  算法执行
          */
         // 距离矩阵，信息素矩阵初始化
-        for (i = 0; i < N; i++) {
+        for (var i = 0; i < N; i++) {
             D[i] = [];
             TAU[i] = [];
-            for (j = 0; j < N; j++) {
+            for (var j = 0; j < N; j++) {
                 D[i][j] = tp_dist(i, j);
                 TAU[i][j] = MAX;
             }
@@ -283,7 +282,7 @@
                                 p[j] = 0;
                             }
                         }
-                        if (sum(p) == 0) {
+                        if (sum(p) === 0) {
                             throw new Error('p is zero list');
                         }
                         else if (isNaN(sum(p))) {
@@ -293,7 +292,7 @@
                     })(ant_k);
                     p_sum = sum(p);
                     //console.log(' p_sum: ' + p_sum)
-                    for (var i = 0; i < p.length; i++) {
+                    for (i = 0; i < p.length; i++) {
                         p[i] /= p_sum;
                     }
                     // 随机选择区间
@@ -329,7 +328,7 @@
             //console.log('l_len: ' + l_len);
             // console.log('l_rout: ' + l_rout);
             // 更新全局最短路径
-            if ( g_len == undefined || l_len < g_len ) {
+            if (g_len === undefined || l_len < g_len) {
                 g_len = l_len;
                 g_rout = l_rout;
             }
@@ -383,11 +382,11 @@
         min = (function (a) {
             var min;
             for (var i = 0; i < a.length; i++) {
-                if (min == undefined || min > a[i]) {
+                if (min === undefined || min > a[i]) {
                     min = a[i];
                 }
             }
-            if (min == undefined) {
+            if (min === undefined) {
                 throw new Error('undefined min');
             }
             return min;
