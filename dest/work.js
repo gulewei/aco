@@ -3,16 +3,16 @@ var Map_1 = require("./Map");
 var Tau_1 = require("./Tau");
 var Travel_1 = require("./Travel");
 var alpha = 1;
-var beta = 1;
-var rho = 1;
-var q = 1;
-var max = 1;
-var min = 1;
-var M = 10;
+var beta = 5;
+var rho = 0.7;
+var q = 100;
+var max = 10;
+var min = 0.01;
+var M = 20;
 var T = 300;
 var sites = (function (path) {
     var rf = require("fs");
-    var root = "../problems/";
+    var root = "./problems/";
     var data = rf.readFileSync(root + path, "utf-8");
     data = data.split("\r\n");
     for (var i = 0; i < data.length; i++) {
@@ -22,14 +22,16 @@ var sites = (function (path) {
         }
     }
     return data;
-})("20cities.csv");
+})("eil51.csv");
 var map = new Map_1.Map(sites);
 var tau = new Tau_1.Tau(map.n, max, min, rho, q);
 var ants = new Ants_1.Ants(M);
 var travel = new Travel_1.Travel(ants, map, tau, alpha, beta);
 var len = null;
 var rout;
+console.time("time: ");
 for (var t = 0; t < T; t++) {
+    // console.log("t: ", t);
     // travel result
     var r = travel.run();
     var tours = r.t;
@@ -46,5 +48,6 @@ for (var t = 0; t < T; t++) {
     // update
     tau.update(tours, evaluates);
 }
+console.timeEnd("time: ");
 console.log(len);
 console.log(rout);

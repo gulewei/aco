@@ -36,6 +36,9 @@ var Ants = (function () {
         }
     };
     Ants.prototype.move = function (ank, site) {
+        // if (this._tabus[ank].indexOf(site) >= 0) {
+        //     throw new Error();
+        // }
         this._sites[ank] = site;
         this._tabus[ank].push(site);
     };
