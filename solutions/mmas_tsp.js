@@ -90,6 +90,7 @@ function mmas_tsp(sites, args) {
     }
     // capacity, travel, giveup, allowed, tabus, site
     function ants_redefine() {
+        var i, j;
         for (i = 0; i < M; i++) {
             tabus[i] = [];
             allowed[i] = [];
@@ -104,6 +105,25 @@ function mmas_tsp(sites, args) {
         // console.log('travel: ' + travel);
         // console.log('giveup: ' + giveup);
         // console.log('site: ' + site);           
+    }
+    // p list
+    function p_list(ant_k) {
+        var p = [];
+        for (var j = 0; j < N; j++) {
+            if (allowed[ant_k][j]) {
+                p[j] = pk(site[ant_k], j);
+            }
+            else {
+                p[j] = 0;
+            }
+        }
+        if (sum(p) === 0) {
+            throw new Error('p is zero list');
+        }
+        else if (isNaN(sum(p))) {
+            throw new Error('sum p is not a number');
+        }
+        return p;
     }
 
     /** 开始：
@@ -130,7 +150,7 @@ function mmas_tsp(sites, args) {
     for (var t = 0; t < T; t++) {
         //console.log('第 ' + t + ' 次循环： ');
         // 随机选择起点 
-        for (var i = 0; i < M; i++) {
+        for (i = 0; i < M; i++) {
             move_to(i, Math.round(Math.random() * (N - 1)));
         }
         // 构建禁忌表矩阵
@@ -140,27 +160,10 @@ function mmas_tsp(sites, args) {
             while (n < N) {
                 //console.log('n: ' + n);
                 // 概率区间列表
-                p = (function (ant_k) {
-                    var p = [];
-                    for (var j = 0; j < N; j++) {
-                        if (allowed[ant_k][j]) {
-                            p[j] = pk(site[ant_k], j);
-                        }
-                        else {
-                            p[j] = 0;
-                        }
-                    }
-                    if (sum(p) == 0) {
-                        throw new Error('p is zero list');
-                    }
-                    else if (isNaN(sum(p))) {
-                        throw new Error('sum p is not a number');
-                    }
-                    return p;
-                })(ant_k);
+                p = p_list(ant_k);
                 p_sum = sum(p);
                 //console.log(' p_sum: ' + p_sum)
-                for (var i = 0; i < p.length; i++) {
+                for (i = 0; i < p.length; i++) {
                     p[i] /= p_sum;
                 }
                 // 随机选择区间
@@ -188,12 +191,12 @@ function mmas_tsp(sites, args) {
         //console.log('l_len: ' + l_len);
         // console.log('l_rout: ' + l_rout);
         // 更新全局最短路径
-        if (l_len < g_len || g_len == undefined) {
+        if (l_len < g_len || g_len === undefined) {
             g_len = l_len;
             g_rout = l_rout;
         }
         // 更新信息素        
-        for (var i = 0; i < N; i++) {
+        for (i = 0; i < N; i++) {
             for (var j = 0; j < N; j++) {
                 new_tau = TAU[i][j] * RHO;
                 // 信息素强度应大于MIN
@@ -225,6 +228,6 @@ function mmas_tsp(sites, args) {
         path: g_len,
         routine: g_rout
     };
-};
+}
 exports.run = mmas_tsp;
 exports.name = "mmas_tsp";
