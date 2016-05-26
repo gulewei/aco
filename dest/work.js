@@ -10,18 +10,19 @@ var max = 1;
 var min = 1;
 var M = 10;
 var T = 300;
-var sites = [
-    [1, 0],
-    [4, 7],
-    [6, 8],
-    [2, 4],
-    [9, 0],
-    [6, 5],
-    [5, 3],
-    [5, 1],
-    [8, 9],
-    [1, 5]
-];
+var sites = (function (path) {
+    var rf = require("fs");
+    var root = "../problems/";
+    var data = rf.readFileSync(root + path, "utf-8");
+    data = data.split("\r\n");
+    for (var i = 0; i < data.length; i++) {
+        data[i] = data[i].split(",");
+        for (var j = 0; j < data[i].length; j++) {
+            data[i][j] = parseFloat(data[i][j]);
+        }
+    }
+    return data;
+})("20cities.csv");
 var map = new Map_1.Map(sites);
 var tau = new Tau_1.Tau(map.n, max, min, rho, q);
 var ants = new Ants_1.Ants(M);
@@ -37,7 +38,7 @@ for (var t = 0; t < T; t++) {
     var best = travel.selectMin(evaluates);
     var l_len = evaluates[best];
     var l_rout = tours[best];
-    // globle path
+    // globe path
     if (l_len < len || len === null) {
         len = l_len;
         rout = l_rout;

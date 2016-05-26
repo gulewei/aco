@@ -79,13 +79,12 @@ var Travel = (function () {
         }
     };
     Travel.prototype.makeAllowed = function (ank, tabu) {
-        var allowed = this.all.filter(function (x) {
+        return this.all.filter(function (x) {
             return tabu.indexOf(x) < 0;
         });
-        return allowed;
     };
     Travel.prototype.run = function () {
-        var N = this.map.n, M = this.ants.m, tours = [null], evaluates = [], ants = this.ants, map = this.map, tau = this.tau, allowed;
+        var N = this.map.n, M = this.ants.m, tours = [null], evaluates = [], ants = this.ants, map = this.map;
         // 重置
         ants.born();
         // 巡游
@@ -95,7 +94,7 @@ var Travel = (function () {
             // 选择并移动到下一座城市，直到完成一次巡游   
             for (var j = 1; j < N; j++) {
                 //let site: number, allowed: number[];
-                allowed = this.makeAllowed(i, ants.tabus[i]);
+                var allowed = this.makeAllowed(i, ants.tabus[i]);
                 ants.move(i, this.chose(ants.sites[i], allowed));
             }
             // 将蚂蚁的路径长度添加到评价列表

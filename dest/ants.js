@@ -5,7 +5,6 @@ var Ants = (function () {
     "use strict";
     function Ants(M) {
         this._M = M;
-        ;
     }
     Object.defineProperty(Ants.prototype, "sites", {
         // ank means ant_k
@@ -34,7 +33,6 @@ var Ants = (function () {
         this._tabus = [];
         for (var i = 0; i < this._M; i++) {
             this._tabus[i] = [];
-            this._sites[i] = null;
         }
     };
     Ants.prototype.move = function (ank, site) {
