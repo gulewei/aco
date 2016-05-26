@@ -1,4 +1,4 @@
-function mmas_tsp(sites, args) {
+function search(sites, args) {
     /** 定义：
      *  变量与函数
      */
@@ -229,5 +229,5 @@ function mmas_tsp(sites, args) {
         routine: g_rout
     };
 }
-exports.run = mmas_tsp;
-exports.name = "mmas_tsp";
+exports.run = search;
+exports.name = "search";

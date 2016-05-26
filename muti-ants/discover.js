@@ -1,20 +1,22 @@
-function paspas_tsp(sites, args) {
+function discover(sites, args) {
+    "use strict";
     /** 定义：
      *  变量与函数
      */
     var M, N, T = args.loop, SITES = sites,
         ALPHA = args.alpha, BETA = args.beta, RHO = args.rho,
         MAX = 10, MIN = 0.1, Q = 100,
-        D = [], tau = [],
+        D = [], TAU = [],
         tabus = [], allowed = [], site = [],
-        bestAnt, lengthLocal, routineLocal = [], lengthGloble, routineGloble = [],
-        p, pathLengthes = [];
+        best_ant, l_len, l_rout = [], g_len, g_rout = [],
+        path_lengthes = [];
 
     N = SITES.length;
     M = N;
     // 计算两点间距离
     function tp_dist(x, y) {
-        return Math.sqrt(Math.pow((SITES[x][0] - SITES[y][0]), 2) + Math.pow((SITES[x][1] - SITES[y][1]), 2));
+        return Math.sqrt(Math.pow((SITES[x][0] - SITES[y][0]), 2) +
+            Math.pow((SITES[x][1] - SITES[y][1]), 2));
     }
     // 计算一条路径的长度
     function rout_dist(rout) {
@@ -45,7 +47,7 @@ function paspas_tsp(sites, args) {
             return 0;
         }
         else {
-            x = Math.pow(tau[i][j], ALPHA) * Math.pow(eta(i, j), BETA);
+            x = Math.pow(TAU[i][j], ALPHA) * Math.pow(eta(i, j), BETA);
             if (isNaN(x)) {
                 throw new Error('pk is not a number');
             }
@@ -89,6 +91,7 @@ function paspas_tsp(sites, args) {
     }
     // capacity, travel, giveup, allowed, tabus, site
     function ants_redefine() {
+        var i, j;
         for (i = 0; i < M; i++) {
             tabus[i] = [];
             allowed[i] = [];
@@ -104,59 +107,40 @@ function paspas_tsp(sites, args) {
         // console.log('giveup: ' + giveup);
         // console.log('site: ' + site);           
     }
-
-    /** 开始：
-     *  算法执行
-     */
-    // 距离矩阵，信息素矩阵初始化
-    for (var i = 0; i < N; i++) {
-        D[i] = [];
-        tau[i] = [];
+    // p list
+    function p_list(ant_k) {
+        var p = [];
         for (var j = 0; j < N; j++) {
-            D[i][j] = tp_dist(i, j);
-            tau[i][j] = MAX;
+            if (allowed[ant_k][j]) {
+                p[j] = pk(site[ant_k], j);
+            }
+            else {
+                p[j] = 0;
+            }
         }
+        if (sum(p) === 0) {
+            throw new Error('p is zero list');
+        }
+        else if (isNaN(sum(p))) {
+            throw new Error('sum p is not a number');
+        }
+        return p;
     }
-    // console.log("tau: " + tau);
-    // console.log("D: " +D);
-    // 初始化禁忌表矩阵等相关数据
-    ants_redefine();
-    // console.time('time');
-    // 主循环
-    var p_sum = 0, next_site, n,
-        delta_tau = 0, new_tau = 0;
-
-    for (var t = 0; t < T; t++) {
-        //console.log('第 ' + t + ' 次循环： ');
+    function tour() {
+        var i, j, p, p_sum = 0, next_site, n;
+        // 重置禁忌表矩阵，allowed矩阵
+        ants_redefine();
         // 随机选择起点 
         for (i = 0; i < M; i++) {
             move_to(i, Math.round(Math.random() * (N - 1)));
         }
         // 构建禁忌表矩阵
-        //console.time('tabus');
         for (var ant_k = 0; ant_k < M; ant_k++) {
             n = 1;
             while (n < N) {
                 //console.log('n: ' + n);
                 // 概率区间列表
-                p = (function (ant_k) {
-                    var p = [];
-                    for (var j = 0; j < N; j++) {
-                        if (allowed[ant_k][j]) {
-                            p[j] = pk(site[ant_k], j);
-                        }
-                        else {
-                            p[j] = 0;
-                        }
-                    }
-                    if (sum(p) === 0) {
-                        throw new Error('p is zero list');
-                    }
-                    else if (isNaN(sum(p))) {
-                        throw new Error('sum p is not a number');
-                    }
-                    return p;
-                })(ant_k);
+                p = p_list(ant_k);
                 p_sum = sum(p);
                 //console.log(' p_sum: ' + p_sum)
                 for (i = 0; i < p.length; i++) {
@@ -170,60 +154,72 @@ function paspas_tsp(sites, args) {
                 n += 1;
             }
         }
-        //console.log('n: ' + n);
-        //console.timeEnd('tabus');
-        // (function tabus_info() {
-        //     for (var i = 0; i < M; i++) {
-        //         console.log('[' + tabus[i] + ']');
-        //     }
-        // })();
-        // 计算循环最短路径
-        for (ant_k = 0; ant_k < M; ant_k++) {
-            pathLengthes[ant_k] = rout_dist(tabus[ant_k]);
-        }
-        bestAnt = select_min(pathLengthes);
-        lengthLocal = pathLengthes[bestAnt];
-        routineLocal = tabus[bestAnt];
-        //console.log('lengthLocal: ' + lengthLocal);
-        // console.log('routineLocal: ' + routineLocal);
-        // 更新全局最短路径
-        if (lengthLocal < lengthGloble || lengthGloble === undefined) {
-            lengthGloble = lengthLocal;
-            routineGloble = routineLocal;
-        }
+
+    }
+    function update() {
+        var i, j, delta_tau, new_tau;
         // 更新信息素        
         for (i = 0; i < N; i++) {
-            for (var j = 0; j < N; j++) {
-                new_tau = tau[i][j] * RHO;
+            for (j = 0; j < N; j++) {
+                new_tau = TAU[i][j] * RHO;
                 // 信息素强度应大于MIN
                 if (new_tau < MIN) {
-                    tau[i][j] = MIN;
+                    TAU[i][j] = MIN;
                 }
                 else {
-                    tau[i][j] = new_tau;
+                    TAU[i][j] = new_tau;
                 }
             }
         }
-        delta_tau = Q / lengthLocal; // 信息素增量
-        for (var site_i = 0; site_i < routineLocal.length - 2; site_i++) {
-            new_tau = tau[routineLocal[site_i]][routineLocal[site_i + 1]] + delta_tau;
+        // 信息素增量
+        delta_tau = Q / l_len;
+        for (var site_i = 0; site_i < l_rout.length - 2; site_i++) {
+            new_tau = TAU[l_rout[site_i]][l_rout[site_i + 1]] + delta_tau;
             // 信息素强度应小于MAX
             if (new_tau > MAX) {
-                tau[routineLocal[site_i]][routineLocal[site_i + 1]] = MAX;
+                TAU[l_rout[site_i]][l_rout[site_i + 1]] = MAX;
             }
             else {
-                tau[routineLocal[site_i]][routineLocal[site_i + 1]] = new_tau;
+                TAU[l_rout[site_i]][l_rout[site_i + 1]] = new_tau;
             }
         }
-        // 重置禁忌表矩阵，allowed矩阵
-        ants_redefine();
     }
-    // console.timeEnd('time');
-    // 返回结果
+    /** 开始：
+     *  算法执行
+     */
+    // 距离矩阵，信息素矩阵初始化
+    for (var i = 0; i < N; i++) {
+        D[i] = [];
+        TAU[i] = [];
+        for (var j = 0; j < N; j++) {
+            D[i][j] = tp_dist(i, j);
+            TAU[i][j] = MAX;
+        }
+    }
+    // console.time('time');
+    // 主循环
+
+    for (var t = 0; t < T; t++) {
+        tour();
+        // 计算循环最短路径
+        for (var ant_k = 0; ant_k < M; ant_k++) {
+            path_lengthes[ant_k] = rout_dist(tabus[ant_k]);
+        }
+        best_ant = select_min(path_lengthes);
+        l_len = path_lengthes[best_ant];
+        l_rout = tabus[best_ant];
+        // 更新全局最短路径
+        if (l_len < g_len || g_len === undefined) {
+            g_len = l_len;
+            g_rout = l_rout;
+        }
+        update();
+    }
+
     return {
-        path: lengthGloble,
-        routine: routineGloble
+        len: g_len,
+        rout: g_rout
     };
 }
-exports.run = paspas_tsp;
-exports.name = "paspas_tsp";
+exports.run = discover;
+exports.name = "discover";
