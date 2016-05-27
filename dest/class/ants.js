@@ -42,6 +42,7 @@ var Ants = (function () {
         this._sites[ank] = site;
         this._tabus[ank].push(site);
     };
+    Ants.prototype.cMove = null;
     return Ants;
 }());
 exports.Ants = Ants;

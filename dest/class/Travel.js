@@ -84,7 +84,7 @@ var Travel = (function () {
             ants.move(i, Math.round(Math.random() * (N - 1)));
             // 选择并移动到下一座城市，直到完成一次巡游   
             for (var j = 1; j < N; j++) {
-                var allowed = this.makeAllowed(ants.tabus[i]);
+                // var allowed = this.makeAllowed(ants.tabus[i]);
                 var next = this.chose(ants.sites[i], this.makeAllowed(ants.tabus[i]));
                 // console.log("ant[%d] - %d move to: %d", i, j, next);
                 ants.move(i, next);
@@ -100,15 +100,15 @@ var Travel = (function () {
         };
     };
     Travel.prototype.vrp = function (C, L) {
-        var N = this.map.n, M = this.ants.m, tours = [], evaluates = [], ants = this.ants, map = this.map, tau = this.tau, allowed, i;
+        var N = this.map.n, M = this.ants.m, tours = [], evaluates = [], ants = this.ants, map = this.map, tau = this.tau, i;
         // for vrp
-        var Move, capacities = [], lengthes = [];
+        var capacities = [], lengthes = [];
         if (arguments.length >= 2) {
             for (i = 0; i < M; i++) {
                 capacities[i] = C;
                 lengthes[i] = L;
             }
-            Move = function (ank, site, C, L) {
+            ants.cMove = function (ank, site, C, L) {
                 if (capacities[ank] - C < 0 || lengthes[ank] - L < 0) {
                     ants.move(ank, 0);
                     capacities[ank] = C;
@@ -122,7 +122,7 @@ var Travel = (function () {
             };
         }
         else {
-            Move = ants.move;
+            ants.cMove = ants.move;
         }
         // 重置
         ants.born();
@@ -133,12 +133,12 @@ var Travel = (function () {
             // 选择并移动到下一座城市，直到完成一次巡游   
             for (var j = 1; j < N; j++) {
                 //let site: number, allowed: number[];
-                allowed = this.makeAllowed(i, ants.tabus[i]);
-                var next_i = this.chose(ants.sites[i], allowed);
-                Move(i, next_i, map.supply[i], map.d[i][next_i]);
+                // var allowed = this.makeAllowed(ants.tabus[i]);
+                var next_i = this.chose(ants.sites[i], this.makeAllowed(ants.tabus[i]));
+                ants.cMove(i, next_i, map.supply[i], map.d[i][next_i]);
             }
             // 将蚂蚁的路径长度添加到评价列表
-            tours[i] = ants.tabs[i];
+            tours[i] = ants.tabus[i];
             evaluates[i] = map.routDist(tours[i]);
         }
         return {
