@@ -3,8 +3,9 @@
  */
 var Map = (function () {
     "use strict";
-    function Map(sites) {
+    function Map(sites, supply) {
         this._sites = sites;
+        this._supply = supply;
         this._D = [];
         var N = this._sites.length;
         this._N = N;
@@ -14,8 +15,17 @@ var Map = (function () {
                 this._D[i][j] = this.tpDist(i, j);
             }
         }
-        //console.log("Map: D ", this._D);
+        if (this._supply === undefined) {
+            console.log("Class Map: this is a TSP map ...");
+        }
     }
+    Object.defineProperty(Map.prototype, "supply", {
+        get: function () {
+            return this._supply;
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(Map.prototype, "d", {
         get: function () {
             return this._D;
@@ -54,5 +64,5 @@ var Map = (function () {
         return x;
     };
     return Map;
-}());
+} ());
 exports.Map = Map;

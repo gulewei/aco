@@ -99,6 +99,53 @@ var Travel = (function () {
             e: evaluates
         };
     };
+    Travel.prototype.vrp = function (C, L) {
+        var N = this.map.n, M = this.ants.m, tours = [], evaluates = [], ants = this.ants, map = this.map, tau = this.tau, allowed, i;
+        // for vrp
+        var Move, capacities = [], lengthes = [];
+        if (arguments.length >= 2) {
+            for (i = 0; i < M; i++) {
+                capacities[i] = C;
+                lengthes[i] = L;
+            }
+            Move = function (ank, site, C, L) {
+                if (capacities[ank] - C < 0 || lengthes[ank] - L < 0) {
+                    ants.move(ank, 0);
+                    capacities[ank] = C;
+                    lengthes[ank] = L;
+                }
+                else {
+                    ants.move(ank, site);
+                    capacities[ank] -= C;
+                    lengthes[ank] -= L;
+                }
+            };
+        }
+        else {
+            Move = ants.move;
+        }
+        // 重置
+        ants.born();
+        // 巡游
+        for (i = 0; i < M; i++) {
+            // 随机起点
+            ants.move(i, Math.round(Math.random() * (N - 1)));
+            // 选择并移动到下一座城市，直到完成一次巡游   
+            for (var j = 1; j < N; j++) {
+                //let site: number, allowed: number[];
+                allowed = this.makeAllowed(i, ants.tabus[i]);
+                var next_i = this.chose(ants.sites[i], allowed);
+                Move(i, next_i, map.supply[i], map.d[i][next_i]);
+            }
+            // 将蚂蚁的路径长度添加到评价列表
+            tours[i] = ants.tabs[i];
+            evaluates[i] = map.routDist(tours[i]);
+        }
+        return {
+            t: tours,
+            e: evaluates
+        };
+    };
     return Travel;
 } ());
 exports.Travel = Travel;

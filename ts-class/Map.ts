@@ -2,11 +2,13 @@
  * Map
  */
 class Map {
-    private _sites: number[][];
-    private _D: number[][];
-    private _N: number;
-    constructor(sites: number[][]) {
+    public _sites: number[][];
+    public _D: number[][];
+    public _N: number;
+    public _supply: number[];
+    constructor(sites: number[][], supply: number[]) {
         this._sites = sites;
+        this._supply = supply;
         this._D = [];
         let N = this._sites.length;
         this._N = N;
@@ -16,6 +18,12 @@ class Map {
                 this._D[i][j] = this.tpDist(i, j);
             }
         }
+        if (this._supply === undefined) {
+            console.log("Class Map: this is a TSP map ...");
+        }
+    }
+    get supply(): number[] {
+        return this._supply;
     }
     get d(): number[][] {
         return this._D;

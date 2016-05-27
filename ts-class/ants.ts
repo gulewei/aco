@@ -2,9 +2,9 @@
  * Ant
  */
 class Ants {
-    _tabus: number[][];
-    _sites: number[];
-    _M: number;
+    public _tabus: number[][];
+    public _sites: number[];
+    public _M: number;
     constructor(M: number) {
         this._M = M;;
     }

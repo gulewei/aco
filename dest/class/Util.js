@@ -1,7 +1,7 @@
 function sort(a) {
     var b = [];
     // copy
-    for (var i = 0; i < b.length; i++) {
+    for (var i = 0; i < a.length; i++) {
         b[i] = a[i];
     }
     // a < b

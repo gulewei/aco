@@ -14,13 +14,13 @@ var min = 0.01;
 var M_1 = 15;
 var M_2 = 25;
 var T = 50;
-var s = 10;
+var s = 2;
 
 var sites = Util.read("eil51.csv");
 var map = new Map_1.Map(sites);
 
 var tau_1 = new Tau_1.Tau(map.n, max, min, rho, q);
-var tau_2 = new Tau_1.Tau(map.n, max, min, rho_f, q);
+var tau_2 = new Tau_1.SearchTau(map.n, max, min, rho_f, q);
 var ants_1 = new Ants_1.Ants(M_1);
 var ants_2 = new Ants_1.Ants(M_2);
 var travel_1 = new Travel_1.Travel(ants_1, map, tau_1, alpha, beta);
@@ -30,7 +30,6 @@ var len = [];
 var rout = [];
 console.time("time: ");
 for (var t = 0; t < T; t++) {
-    // console.log("t: ", t);
     // travel result
     var r1 = travel_1.run();
     var r2 = travel_2.run();
@@ -38,7 +37,7 @@ for (var t = 0; t < T; t++) {
     var evaluates = r1.e.concat(r2.e);
     // record
     var best = Util.selectMin(evaluates);
-    console.log("t: %d, best: ", t, best);
+    console.log("t: %d, best: %d", t, best);
     len[t] = evaluates[best];
     rout[t] = tours[best];
     // change
@@ -53,7 +52,8 @@ for (var t = 0; t < T; t++) {
 }
 console.timeEnd("time: ");
 console.log("len", len);
-var ans = Util.selectMin(len);
-console.log("min path length: ", ans);
-console.log("first found in loop: ", len.indexOf(ans));
-console.log("routine: ", rout[ans]);
+var ans = Util.sort(len);
+console.log("ans ", ans[0]);
+console.log("min path length: ", ans[0]);
+console.log("first found in loop: ", len.indexOf(ans[0]));
+console.log("routine: ", rout[len.indexOf(ans[0])]);
